@@ -7,10 +7,10 @@ The game has multiple difficulty levels and also supports both **Light** and **D
 
 ## Screenshots
 <p align="center">
-  <img src="Screenshots/1.png" alt="Small Board" width="450"/>
-  <img src="Screenshots/2.png" alt="Medium Board" width="450"/>
-  <img src="Screenshots/3.png" alt="Large Board" width="450"/>
-  <img src="Screenshots/4.png" alt="Night theme" width="450"/>
+  <img src="Screenshots/1.png" alt="Small Board" width="500"/>
+  <img src="Screenshots/2.png" alt="Medium Board" width="500"/>
+  <img src="Screenshots/3.png" alt="Large Board" width="500"/>
+  <img src="Screenshots/4.png" alt="Night theme" width="500"/>
 </p>
 
 ## Features
