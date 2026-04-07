@@ -10,6 +10,8 @@ import Foundation
 
 class GameViewModel: ObservableObject {
   @Published var board: [[Cell]] = []
+  @Published var activeAlert: GameAlert?
+  
   @Published var difficult : Difficult = .amateur {
     didSet {
       DispatchQueue.main.async {
@@ -17,7 +19,7 @@ class GameViewModel: ObservableObject {
       }
     }
   }
-  @Published var isGameOver: Bool = false
+  
   @Published var gameState: GameState = .waiting {
     didSet {
       if gameState == .won {
@@ -30,27 +32,15 @@ class GameViewModel: ObservableObject {
     }
   }
   
-  @Published var activeAlert: GameAlert?
-  
   var height: Int = 0
   var width: Int = 0
   var mines: Int = 0
   
-  var openedCells = 0
+  private var openedCells = 0
   
   init() {
     DispatchQueue.main.async {
       self.generateBoard()
-    }
-  }
-  
-  private func generateBoard() {
-    setValuesFromDifficult()
-    openedCells = 0
-    self.board = (0..<height).map { y in
-      (0..<width).map { x in
-        Cell(x: x, y: y)
-      }
     }
   }
   
@@ -85,29 +75,32 @@ class GameViewModel: ObservableObject {
     }
   }
   
-  private func openFreeCells(x: Int, y: Int) {
-    
-    if x < 0 || x >= width || y < 0 || y >= height {
-      return
-    }
-    
-    if !board[y][x].isClosed || board[y][x].isFlag {
-      return
-    }
-    
-    board[y][x].isClosed = false
-    openedCells += 1
-    
-    if board[y][x].closeMines > 0 {
-      return
-    }
-    
-    for dx in -1...1 {
-      for dy in -1...1 {
-        if dx == 0 && dy == 0 { continue }
-        
-        openFreeCells(x: x + dx, y: y + dy)
+  // MARK: - Generating Board
+  
+  private func generateBoard() {
+    setValuesFromDifficult()
+    openedCells = 0
+    self.board = (0..<height).map { y in
+      (0..<width).map { x in
+        Cell(x: x, y: y)
       }
+    }
+  }
+  
+  private func setValuesFromDifficult() {
+    switch difficult {
+    case .beginner:
+      height = 10
+      width = 10
+      mines = 10
+    case .amateur:
+      height = 16
+      width = 16
+      mines = 40
+    case .expert:
+      height = 16
+      width = 30
+      mines = 99
     }
   }
   
@@ -159,41 +152,31 @@ class GameViewModel: ObservableObject {
     }
   }
   
-  private func setValuesFromDifficult() {
-    switch difficult {
-    case .beginner:
-      height = 10
-      width = 10
-      mines = 10
-    case .amateur:
-      height = 16
-      width = 16
-      mines = 40
-    case .expert:
-      height = 16
-      width = 30
-      mines = 99
+  // MARK: - Opening cell
+  
+  private func openFreeCells(x: Int, y: Int) {
+    
+    if x < 0 || x >= width || y < 0 || y >= height {
+      return
+    }
+    
+    if !board[y][x].isClosed || board[y][x].isFlag {
+      return
+    }
+    
+    board[y][x].isClosed = false
+    openedCells += 1
+    
+    if board[y][x].closeMines > 0 {
+      return
+    }
+    
+    for dx in -1...1 {
+      for dy in -1...1 {
+        if dx == 0 && dy == 0 { continue }
+        
+        openFreeCells(x: x + dx, y: y + dy)
+      }
     }
   }
 }
-
-enum GameState {
-  case waiting
-  case playing
-  case won
-  case lost
-}
-
-enum GameAlert: Identifiable {
-    case won
-    case lost
-    
-    var id: Int {
-        switch self {
-        case .won: return 1
-        case .lost: return 2
-        }
-    }
-}
-
-
