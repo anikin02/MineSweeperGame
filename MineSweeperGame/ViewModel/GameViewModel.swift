@@ -18,11 +18,25 @@ class GameViewModel: ObservableObject {
     }
   }
   @Published var isGameOver: Bool = false
-  @Published var gameState: GameState = .waiting
+  @Published var gameState: GameState = .waiting {
+    didSet {
+      if gameState == .won {
+        activeAlert = .won
+      } else if gameState == .lost {
+        activeAlert = .lost
+      } else {
+        activeAlert = nil
+      }
+    }
+  }
+  
+  @Published var activeAlert: GameAlert?
   
   var height: Int = 0
   var width: Int = 0
   var mines: Int = 0
+  
+  var openedCells = 0
   
   init() {
     DispatchQueue.main.async {
@@ -32,10 +46,11 @@ class GameViewModel: ObservableObject {
   
   private func generateBoard() {
     setValuesFromDifficult()
+    openedCells = 0
     self.board = (0..<height).map { y in
-        (0..<width).map { x in
-            Cell(x: x, y: y)
-        }
+      (0..<width).map { x in
+        Cell(x: x, y: y)
+      }
     }
   }
   
@@ -59,6 +74,9 @@ class GameViewModel: ObservableObject {
         gameState = .lost
       } else {
         openFreeCells(x: x, y: y)
+        if openedCells == width * height - mines {
+          gameState = .won
+        }
       }
     case .won:
       print("Nothing")
@@ -68,28 +86,29 @@ class GameViewModel: ObservableObject {
   }
   
   private func openFreeCells(x: Int, y: Int) {
-
-      if x < 0 || x >= width || y < 0 || y >= height {
-          return
+    
+    if x < 0 || x >= width || y < 0 || y >= height {
+      return
+    }
+    
+    if !board[y][x].isClosed || board[y][x].isFlag {
+      return
+    }
+    
+    board[y][x].isClosed = false
+    openedCells += 1
+    
+    if board[y][x].closeMines > 0 {
+      return
+    }
+    
+    for dx in -1...1 {
+      for dy in -1...1 {
+        if dx == 0 && dy == 0 { continue }
+        
+        openFreeCells(x: x + dx, y: y + dy)
       }
-      
-      if !board[y][x].isClosed || board[y][x].isFlag {
-          return
-      }
-      
-      board[y][x].isClosed = false
-      
-      if board[y][x].closeMines > 0 {
-          return
-      }
-      
-      for dx in -1...1 {
-          for dy in -1...1 {
-              if dx == 0 && dy == 0 { continue }
-              
-              openFreeCells(x: x + dx, y: y + dy)
-          }
-      }
+    }
   }
   
   private func generateMines(firstX: Int, firstY: Int) {
@@ -163,6 +182,18 @@ enum GameState {
   case playing
   case won
   case lost
+}
+
+enum GameAlert: Identifiable {
+    case won
+    case lost
+    
+    var id: Int {
+        switch self {
+        case .won: return 1
+        case .lost: return 2
+        }
+    }
 }
 
 
