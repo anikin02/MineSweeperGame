@@ -61,16 +61,18 @@ struct GameView: View {
               }) {
                 Text(displayText(viewModel.board[y][x]))
                   .frame(width: 30, height: 30)
-                  .background(viewModel.board[y][x].isClosed ? Color.gray : Color.white)
+                  .background(viewModel.board[y][x].isClosed ? Color("ClosedCellColor") : .white)
                   .border(Color.black, width: 1)
                   .font(.system(size: 14))
-                  .foregroundColor(.black)
+                  .foregroundStyle(neighborColor(viewModel.board[y][x].closeMines))
               }
               .buttonStyle(PlainButtonStyle())
             }
           }
         }
       }
+      
+      Spacer()
     }
   }
   
