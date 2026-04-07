@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct HeaderView: View {
-  let minesLeft: Int
+  @Binding var flagsLeft: Int
   
   var body: some View {
     HStack {
@@ -18,7 +18,7 @@ struct HeaderView: View {
       
       Spacer()
       
-      Text("Mines left: \(minesLeft)")
+      Text("Flags left: \(flagsLeft)")
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(.blue.opacity(0.2))

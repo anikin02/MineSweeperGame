@@ -22,15 +22,21 @@ class GameViewModel: ObservableObject {
   
   @Published var gameState: GameState = .waiting {
     didSet {
-      if gameState == .won {
-        activeAlert = .won
-      } else if gameState == .lost {
-        activeAlert = .lost
-      } else {
-        activeAlert = nil
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self else { return }
+        switch self.gameState {
+        case .won:
+          self.activeAlert = .won
+        case .lost:
+          self.activeAlert = .lost
+        default:
+          self.activeAlert = nil
+        }
       }
     }
   }
+  
+  @Published var flags: Int = 0
   
   var height: Int = 0
   var width: Int = 0
@@ -51,14 +57,14 @@ class GameViewModel: ObservableObject {
     }
   }
   
-  func openCell(x: Int, y: Int) {
+  func changeCell(x: Int, y: Int) {
     switch gameState {
     case .waiting:
       generateMines(firstX: x, firstY: y)
       calculateCloseMines()
       openFreeCells(x: x, y: y)
-      gameState = .playing
-    case .playing:
+      gameState = .openingCell
+    case .openingCell:
       if board[y][x].isMine {
         board[y][x].isClosed = false
         gameState = .lost
@@ -68,10 +74,21 @@ class GameViewModel: ObservableObject {
           gameState = .won
         }
       }
-    case .won:
-      print("Nothing")
-    case .lost:
-      print("Nothing")
+    case .settingFlags:
+      setFlag(x: x, y: y)
+    default: return
+    }
+  }
+  
+  func setFlag(x: Int, y: Int) {
+    if board[y][x].isClosed {
+      if board[y][x].isFlag {
+        flags += 1
+        board[y][x].isFlag.toggle()
+      } else if flags > 0 {
+        flags -= 1
+        board[y][x].isFlag.toggle()
+      }
     }
   }
   
@@ -93,14 +110,17 @@ class GameViewModel: ObservableObject {
       height = 10
       width = 10
       mines = 10
+      flags = 10
     case .amateur:
       height = 16
       width = 16
       mines = 40
+      flags = 40
     case .expert:
       height = 16
       width = 30
       mines = 99
+      flags = 99
     }
   }
   
@@ -152,7 +172,7 @@ class GameViewModel: ObservableObject {
     }
   }
   
-  // MARK: - Opening cell
+  // MARK: - Opening cells
   
   private func openFreeCells(x: Int, y: Int) {
     

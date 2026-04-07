@@ -12,14 +12,10 @@ struct GameView: View {
   
   var body: some View {
     VStack {
-      HeaderView(minesLeft: viewModel.mines)
+      HeaderView(flagsLeft: $viewModel.flags)
       
       ControlPanelView(viewModel: viewModel)
         .padding(.vertical, 8)
-      
-      Text("LBM - open, RMB - flag/chord")
-        .font(.caption)
-        .foregroundStyle(.secondary)
       
       BoardView(viewModel: viewModel)
       

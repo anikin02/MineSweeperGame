@@ -24,6 +24,7 @@ struct CellView: View {
   }
   
   private func displayText(_ cell: Cell) -> String {
+    if cell.isFlag && cell.isClosed { return "🚩" }
     if cell.isClosed { return "" }
     if cell.isMine { return "💣" }
     return cell.closeMines == 0 ? "" : "\(cell.closeMines)"

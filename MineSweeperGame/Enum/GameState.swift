@@ -5,11 +5,14 @@
 //  Created by Данил Аникин on 07/04/2026.
 //
 
-enum GameState {
+enum GameState: String, CaseIterable, Identifiable {
   case waiting
-  case playing
+  case openingCell
+  case settingFlags
   case won
   case lost
+  
+  var id: String { self.rawValue }
 }
 
 enum GameAlert: Identifiable {

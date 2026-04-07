@@ -18,7 +18,7 @@ struct BoardView: View {
             CellView(
               cell: viewModel.board[y][x],
               action: {
-                viewModel.openCell(x: x, y: y)
+                viewModel.changeCell(x: x, y: y)
               }
             )
           }
