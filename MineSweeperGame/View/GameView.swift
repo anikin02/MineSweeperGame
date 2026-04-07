@@ -36,10 +36,11 @@ struct GameView: View {
           }
           .pickerStyle(.menu)
           .padding()
+          .disabled(viewModel.gameState != .waiting)
         }
         
         Button() {
-          
+          viewModel.newGame()
         } label: {
           Text("New Game")
         }

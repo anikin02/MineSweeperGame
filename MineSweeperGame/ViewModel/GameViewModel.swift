@@ -39,6 +39,13 @@ class GameViewModel: ObservableObject {
     }
   }
   
+  func newGame() {
+    gameState = .waiting
+    DispatchQueue.main.async {
+      self.generateBoard()
+    }
+  }
+  
   func openCell(x: Int, y: Int) {
     switch gameState {
     case .waiting:
